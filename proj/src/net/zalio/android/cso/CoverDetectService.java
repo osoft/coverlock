@@ -80,6 +80,7 @@ public class CoverDetectService extends Service implements SensorEventListener {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		Settings.init(this.getApplicationContext());
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 		mSensorManager.registerListener(this, mSensor,
@@ -122,7 +123,9 @@ public class CoverDetectService extends Service implements SensorEventListener {
 		MyLog.i(TAG, "Proximity: " + event.values[0]);
 		float prox = event.values[0];
 		if (prox == 0.0f) {
-			scheduleScreenOff();
+			if(Settings.enable_Auto_Screen_Off){
+				scheduleScreenOff();
+			}
 		} else {
 			cancelScreenOff();
 			if(Settings.enable_Auto_Screen_On){

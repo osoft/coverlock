@@ -70,6 +70,7 @@ public class SettingsActivity extends PreferenceActivity {
        
         findPreference("pref_enable_service").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         findPreference("pref_enable_auto_screen_on").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        findPreference("pref_enable_auto_screen_off").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         
         mPolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         boolean active = mPolicyManager
@@ -201,8 +202,12 @@ public class SettingsActivity extends PreferenceActivity {
             			Settings.enable_Service = true;
                     	Intent i = new Intent(mContext, CoverDetectService.class);
                     	mContext.startService(i);
+                    	AliveKeeper keeper = new AliveKeeper(mContext);
+                    	keeper.startKeeping();
             		}else{
             			MyLog.i(TAG, "Stopping Service");
+            			AliveKeeper keeper = new AliveKeeper(mContext);
+            			keeper.stopKeeping();
             			Settings.enable_Service = false;
             			CoverDetectService.getInstance().stopSelf();
             		}
@@ -213,6 +218,14 @@ public class SettingsActivity extends PreferenceActivity {
             		}else{
             			Settings.enable_Auto_Screen_On = false;
             			MyLog.i(TAG, "disabled auto screen on");
+            		}          		
+            	}else if(preference.getKey().equals("pref_enable_auto_screen_off")){
+            		if(stringValue.equals("true")){
+            			Settings.enable_Auto_Screen_Off = true;
+            			MyLog.i(TAG, "enable auto screen off");
+            		}else{
+            			Settings.enable_Auto_Screen_Off = false;
+            			MyLog.i(TAG, "disabled auto screen off");
             		}          		
             	}
             }

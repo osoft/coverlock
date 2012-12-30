@@ -20,10 +20,15 @@
         android:title="@string/pref_timeout_title" />
     
     <CheckBoxPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="pref_enable_auto_screen_on"
         android:summary="@string/pref_enable_auto_screen_on_desc"
         android:title="@string/pref_enable_auto_screen_on" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_enable_auto_screen_off"
+        android:summary="@string/pref_enable_auto_screen_off_desc"
+        android:title="@string/pref_enable_auto_screen_off" />
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->

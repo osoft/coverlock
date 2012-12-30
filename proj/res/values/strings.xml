@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">Cover Lock</string>
-    <string name="prompt_acquiring_device_admin">This application need this permission to lock your screen</string>
+    <string name="app_name">Simple Cover Lock</string>
+    <string name="prompt_acquiring_device_admin">This application needs this permission to lock your screen</string>
 
 </resources>

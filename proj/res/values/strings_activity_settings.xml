@@ -21,6 +21,8 @@
     </string-array>
     <string name="pref_enable_auto_screen_on">Enable Auto Screen On</string>
     <string name="pref_enable_auto_screen_on_desc">The screen will be turned on after opening the cover.</string>
+    <string name="pref_enable_auto_screen_off">Enable Auto Screen Off</string>
+    <string name="pref_enable_auto_screen_off_desc">The screen will be turned off after closing the cover.</string>
     
     <!-- Unused from this line below -->
     <string name="pref_title_social_recommendations">Enable social recommendations</string>
