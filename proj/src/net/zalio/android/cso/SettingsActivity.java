@@ -3,9 +3,14 @@ package net.zalio.android.cso;
 import java.util.List;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -43,6 +48,7 @@ public class SettingsActivity extends PreferenceActivity {
      */
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
 	protected static final String TAG = "SettingsActivity";
+	private static final int REQ_CODE = Settings.class.hashCode();
 	private static Context mContext;
 	private DevicePolicyManager mPolicyManager;
 
@@ -54,21 +60,14 @@ public class SettingsActivity extends PreferenceActivity {
         mContext = getBaseContext();
         setupSimplePreferencesScreen();
         PreferenceManager prefManager = this.getPreferenceManager();
-        SharedPreferences pref = prefManager.getSharedPreferences();
-        Boolean isStartingService = pref.getBoolean("pref_enable_service", false);
-        Settings.enable_Service = isStartingService;
-        if(isStartingService){
-        	Log.i("cso", "isStarting = true");
-        	
-        	Intent i = new Intent(this.getApplicationContext(), CoverDetectService.class);
-        	startService(i);
-        }
-        else{
-        	Log.i("cso", "isStarting = false");
-        }
-        Settings.enable_Auto_Screen_On = pref.getBoolean("pref_enable_auto_screen_on", false);
+        final SharedPreferences pref = prefManager.getSharedPreferences();
+        
+        Settings.init(this);
        
         findPreference("pref_enable_service").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        findPreference("pref_timeout_list").setDependency("pref_enable_service");
+        findPreference("pref_enable_auto_screen_on").setDependency("pref_enable_service");
+        findPreference("pref_enable_auto_screen_off").setDependency("pref_enable_service");
         findPreference("pref_enable_auto_screen_on").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         findPreference("pref_enable_auto_screen_off").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         
@@ -77,13 +76,55 @@ public class SettingsActivity extends PreferenceActivity {
 				.isAdminActive(new ComponentName(this,
 						CSODeviceAdminReceiver.class));
         if(active){
+            if(Settings.enable_Service){        	
+            	Intent i = new Intent(this.getApplicationContext(), CoverDetectService.class);
+            	startService(i);
+            }
         	return;
         }
-        Intent acquireAdmin = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-        acquireAdmin.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, 
-        		new ComponentName(this, CSODeviceAdminReceiver.class));
-        acquireAdmin.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, getString(R.string.prompt_acquiring_device_admin));
-        startActivityForResult(acquireAdmin, 0);
+        Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.app_name));
+        builder.setMessage(getString(R.string.prompt_acquiring_device_admin));
+        builder.setPositiveButton(android.R.string.ok, new OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Intent acquireAdmin = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+				acquireAdmin.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, 
+						new ComponentName(SettingsActivity.this, CSODeviceAdminReceiver.class));
+				acquireAdmin.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, getString(R.string.prompt_acquiring_device_admin));
+				startActivityForResult(acquireAdmin, REQ_CODE);
+				dialog.dismiss();
+			}
+        	
+        });
+        builder.setNegativeButton(android.R.string.no, new OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				pref.edit().putBoolean("pref_enable_service", false).commit();
+				if(CoverDetectService.getInstance() != null){
+					CoverDetectService.getInstance().stopSelf();
+				}
+				dialog.cancel();
+				finish();
+			}
+        	
+        });
+        builder.setCancelable(false);
+        builder.create().show();
+    }
+    
+    @Override
+	protected
+    void onActivityResult(int requestCode, int resultCode, Intent data){
+    	if(requestCode == REQ_CODE){
+    		if(resultCode == Activity.RESULT_OK){
+    			
+    		}else{
+    			finish();
+    		}
+    	}
     }
 
     /**
