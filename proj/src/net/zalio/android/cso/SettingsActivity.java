@@ -64,12 +64,16 @@ public class SettingsActivity extends PreferenceActivity {
         
         Settings.init(this);
        
-        findPreference("pref_enable_service").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        // Set dependencies
         findPreference("pref_timeout_list").setDependency("pref_enable_service");
         findPreference("pref_enable_auto_screen_on").setDependency("pref_enable_service");
         findPreference("pref_enable_auto_screen_off").setDependency("pref_enable_service");
+        findPreference("pref_enable_disable_auto_screen_off_in_landscape").setDependency("pref_enable_auto_screen_off");        
+        // Set Listeners
+        findPreference("pref_enable_service").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         findPreference("pref_enable_auto_screen_on").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         findPreference("pref_enable_auto_screen_off").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        findPreference("pref_enable_disable_auto_screen_off_in_landscape").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         
         mPolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         boolean active = mPolicyManager
@@ -268,6 +272,9 @@ public class SettingsActivity extends PreferenceActivity {
             			Settings.enable_Auto_Screen_Off = false;
             			MyLog.i(TAG, "disabled auto screen off");
             		}          		
+            	}else if(preference.getKey().equals("pref_enable_disable_auto_screen_off_in_landscape")){
+            		Settings.enable_Disable_Auto_Screen_Off_In_Landscape = 
+            				stringValue.equals("true");
             	}
             }
             return true;

@@ -29,7 +29,12 @@
         android:key="pref_enable_auto_screen_off"
         android:summary="@string/pref_enable_auto_screen_off_desc"
         android:title="@string/pref_enable_auto_screen_off" />
-
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_enable_disable_auto_screen_off_in_landscape"
+        android:summary="@string/pref_enable_disable_auto_screen_off_in_landscape_desc"
+        android:title="@string/pref_enable_disable_auto_screen_off_in_landscape" />
+    
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
     <!-- EditTextPreference
